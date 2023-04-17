@@ -5,6 +5,20 @@ class History extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text('Histórico');
+    final textTheme = Theme.of(context)
+        .textTheme
+        .apply(displayColor: Theme.of(context).colorScheme.onSurface);
+    return SizedBox(
+      width: MediaQuery.of(context).size.width / 3,
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Histórico', style: textTheme.titleLarge),
+          ],
+        ),
+      ),
+    );
   }
 }

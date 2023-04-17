@@ -6,11 +6,9 @@ class Patient {
   Id id = Isar.autoIncrement;
   String nome;
   int idade;
-  bool habilitado;
 
   Patient(
     this.nome,
     this.idade,
-    this.habilitado,
   );
 }

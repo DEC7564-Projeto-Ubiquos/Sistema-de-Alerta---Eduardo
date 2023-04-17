@@ -21,7 +21,7 @@ class Panel extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     PatientSection(
-                      patient: Patient('', 0, false),
+                      patient: Patient('Igor Enrick de Carvalho', 26),
                     ),
                     Spacer(),
                     Graph(),

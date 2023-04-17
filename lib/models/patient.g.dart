@@ -17,18 +17,13 @@ const PatientSchema = CollectionSchema(
   name: r'Patient',
   id: -3057427754190339924,
   properties: {
-    r'habilitado': PropertySchema(
-      id: 0,
-      name: r'habilitado',
-      type: IsarType.bool,
-    ),
     r'idade': PropertySchema(
-      id: 1,
+      id: 0,
       name: r'idade',
       type: IsarType.long,
     ),
     r'nome': PropertySchema(
-      id: 2,
+      id: 1,
       name: r'nome',
       type: IsarType.string,
     )
@@ -63,9 +58,8 @@ void _patientSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeBool(offsets[0], object.habilitado);
-  writer.writeLong(offsets[1], object.idade);
-  writer.writeString(offsets[2], object.nome);
+  writer.writeLong(offsets[0], object.idade);
+  writer.writeString(offsets[1], object.nome);
 }
 
 Patient _patientDeserialize(
@@ -75,9 +69,8 @@ Patient _patientDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Patient(
-    reader.readString(offsets[2]),
-    reader.readLong(offsets[1]),
-    reader.readBool(offsets[0]),
+    reader.readString(offsets[1]),
+    reader.readLong(offsets[0]),
   );
   object.id = id;
   return object;
@@ -91,10 +84,8 @@ P _patientDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readBool(offset)) as P;
-    case 1:
       return (reader.readLong(offset)) as P;
-    case 2:
+    case 1:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -190,16 +181,6 @@ extension PatientQueryWhere on QueryBuilder<Patient, Patient, QWhereClause> {
 
 extension PatientQueryFilter
     on QueryBuilder<Patient, Patient, QFilterCondition> {
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> habilitadoEqualTo(
-      bool value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'habilitado',
-        value: value,
-      ));
-    });
-  }
-
   QueryBuilder<Patient, Patient, QAfterFilterCondition> idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -443,18 +424,6 @@ extension PatientQueryLinks
     on QueryBuilder<Patient, Patient, QFilterCondition> {}
 
 extension PatientQuerySortBy on QueryBuilder<Patient, Patient, QSortBy> {
-  QueryBuilder<Patient, Patient, QAfterSortBy> sortByHabilitado() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'habilitado', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Patient, Patient, QAfterSortBy> sortByHabilitadoDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'habilitado', Sort.desc);
-    });
-  }
-
   QueryBuilder<Patient, Patient, QAfterSortBy> sortByIdade() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'idade', Sort.asc);
@@ -482,18 +451,6 @@ extension PatientQuerySortBy on QueryBuilder<Patient, Patient, QSortBy> {
 
 extension PatientQuerySortThenBy
     on QueryBuilder<Patient, Patient, QSortThenBy> {
-  QueryBuilder<Patient, Patient, QAfterSortBy> thenByHabilitado() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'habilitado', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Patient, Patient, QAfterSortBy> thenByHabilitadoDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'habilitado', Sort.desc);
-    });
-  }
-
   QueryBuilder<Patient, Patient, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -533,12 +490,6 @@ extension PatientQuerySortThenBy
 
 extension PatientQueryWhereDistinct
     on QueryBuilder<Patient, Patient, QDistinct> {
-  QueryBuilder<Patient, Patient, QDistinct> distinctByHabilitado() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'habilitado');
-    });
-  }
-
   QueryBuilder<Patient, Patient, QDistinct> distinctByIdade() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'idade');
@@ -558,12 +509,6 @@ extension PatientQueryProperty
   QueryBuilder<Patient, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
-    });
-  }
-
-  QueryBuilder<Patient, bool, QQueryOperations> habilitadoProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'habilitado');
     });
   }
 
