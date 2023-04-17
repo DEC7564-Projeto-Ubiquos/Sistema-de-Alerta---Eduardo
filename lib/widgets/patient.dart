@@ -1,7 +1,12 @@
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:emg_app/models/patient.dart';
+import 'package:flutter/material.dart';
 
-class Patient extends StatelessWidget {
-  const Patient({super.key});
+class PatientSection extends StatelessWidget {
+  final Patient patient;
+  const PatientSection({
+    super.key,
+    required this.patient,
+  });
 
   @override
   Widget build(BuildContext context) {
