@@ -19,14 +19,16 @@ class Panel extends StatelessWidget {
               children: [
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
                   children: [
                     PatientSection(
                       patient: Patient('Igor Enrick de Carvalho', 26),
                     ),
-                    Spacer(),
-                    Graph(),
-                    Spacer(),
-                    Samples(),
+                    const SizedBox(height: 10),
+                    const Graph(),
+                    const SizedBox(height: 10),
+                    const Samples(),
                   ],
                 ),
                 const History(),

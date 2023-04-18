@@ -9,7 +9,7 @@ class History extends StatelessWidget {
         .textTheme
         .apply(displayColor: Theme.of(context).colorScheme.onSurface);
     return SizedBox(
-      width: MediaQuery.of(context).size.width / 3,
+      width: MediaQuery.of(context).size.width / 4,
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
