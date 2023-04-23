@@ -14,25 +14,31 @@ class Panel extends StatelessWidget {
       body: Stack(
         children: <Widget>[
           Positioned(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    PatientSection(
-                      patient: Patient('Igor Enrick de Carvalho', 26),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        PatientSection(
+                          patient: Patient('Igor Enrick de Carvalho', 26),
+                        ),
+                        const SizedBox(height: 10),
+                        const Graph(),
+                        const SizedBox(height: 10),
+                        const Samples(),
+                      ],
                     ),
-                    const SizedBox(height: 10),
-                    const Graph(),
-                    const SizedBox(height: 10),
-                    const Samples(),
-                  ],
-                ),
-                const History(),
-              ],
+                  ),
+                  const History(),
+                ],
+              ),
             ),
           ),
           Positioned(

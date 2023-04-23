@@ -5,7 +5,7 @@ class Samples extends StatefulWidget {
   const Samples({Key? key}) : super(key: key);
 
   @override
-  _SamplesState createState() => _SamplesState();
+  State<Samples> createState() => _SamplesState();
 }
 
 class _SamplesState extends State<Samples> {
@@ -18,33 +18,30 @@ class _SamplesState extends State<Samples> {
       child: SizedBox(
         width: (MediaQuery.of(context).size.width * 0.75) - 32,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               controller: _scrollController,
-              child: SizedBox(
-                width: (MediaQuery.of(context).size.width * 0.75) - 32,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
-                    SampleCard(
-                      nome: 'Referência',
-                      valor: '100%',
-                    ),
-                    SampleCard(
-                      nome: 'Amostra 1',
-                      valor: '97.5%',
-                    ),
-                    SampleCard(
-                      nome: 'Amostra 2',
-                      valor: '89.6%',
-                    ),
-                    SampleCard(
-                      nome: 'Atual',
-                      valor: '98.1%',
-                    ),
-                  ],
-                ),
+              child: Row(
+                children: const [
+                  SampleCard(
+                    nome: 'Referência',
+                    valor: '100%',
+                  ),
+                  SampleCard(
+                    nome: 'Amostra 1',
+                    valor: '97.5%',
+                  ),
+                  SampleCard(
+                    nome: 'Amostra 2',
+                    valor: '89.6%',
+                  ),
+                  SampleCard(
+                    nome: 'Atual',
+                    valor: '98.1%',
+                  ),
+                ],
               ),
             ),
             Row(

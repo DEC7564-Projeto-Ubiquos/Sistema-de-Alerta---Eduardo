@@ -6,7 +6,7 @@ class Graph extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.fromLTRB(24, 0, 16, 0),
       child: Row(
         children: [
           Container(
@@ -17,7 +17,7 @@ class Graph extends StatelessWidget {
           Container(
             color: const Color.fromARGB(50, 98, 0, 238),
             height: 300,
-            width: 600,
+            width: (MediaQuery.of(context).size.width * 0.75) - 140,
           ),
         ],
       ),
