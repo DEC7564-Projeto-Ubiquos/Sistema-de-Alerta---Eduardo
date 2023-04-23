@@ -36,6 +36,7 @@ dependencies:
   get_it: ^7.2.0 # https://pub.dev/packages/get_it
   fluent_ui: ^4.4.0 # https://pub.dev/packages/fluent_ui
   fluentui_system_icons: ^1.1.199 # https://pub.dev/packages/fluentui_system_icons || lista de ícones: https://github.com/microsoft/fluentui-system-icons/blob/main/icons_regular.md
+  syncfusion_flutter_charts: ^21.1.41
 
 dev_dependencies:
   flutter_test:
