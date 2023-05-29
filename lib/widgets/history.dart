@@ -28,8 +28,8 @@ class _HistoryState extends State<History> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Histórico', style: textTheme.titleLarge),
-              Column(
-                children: const [
+              const Column(
+                children: [
                   HistoryCard(nome: 'Exame 1', data: '21/04/2023'),
                   HistoryCard(nome: 'Exame 2', data: '22/04/2023'),
                   HistoryCard(nome: 'Exame 3', data: '23/04/2023'),

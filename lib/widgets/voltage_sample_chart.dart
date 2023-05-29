@@ -19,12 +19,12 @@ class VoltageSampleChart extends StatelessWidget {
       primaryXAxis: NumericAxis(
         title: AxisTitle(text: 'Amostra (kHz)'),
         interval: 1,
-        majorGridLines: MajorGridLines(width: 0),
+        majorGridLines: const MajorGridLines(width: 0),
       ),
       primaryYAxis: NumericAxis(
         title: AxisTitle(text: 'Tensão (mV)'),
         interval: 100,
-        majorGridLines: MajorGridLines(width: 0),
+        majorGridLines: const MajorGridLines(width: 0),
       ),
       series: <ChartSeries>[
         SplineSeries<VoltageSample, double>(

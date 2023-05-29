@@ -3,12 +3,13 @@ part 'patient.g.dart';
 
 @Collection()
 class Patient {
-  Id id = Isar.autoIncrement;
-  String nome;
+  Id id;
+  String identificador;
   int idade;
 
   Patient(
-    this.nome,
-    this.idade,
-  );
+    this.identificador,
+    this.idade, {
+    Id? id,
+  }) : id = id ?? Isar.autoIncrement;
 }

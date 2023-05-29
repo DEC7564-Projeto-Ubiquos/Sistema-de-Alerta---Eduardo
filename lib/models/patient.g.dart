@@ -22,9 +22,9 @@ const PatientSchema = CollectionSchema(
       name: r'idade',
       type: IsarType.long,
     ),
-    r'nome': PropertySchema(
+    r'identificador': PropertySchema(
       id: 1,
-      name: r'nome',
+      name: r'identificador',
       type: IsarType.string,
     )
   },
@@ -48,7 +48,7 @@ int _patientEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  bytesCount += 3 + object.nome.length * 3;
+  bytesCount += 3 + object.identificador.length * 3;
   return bytesCount;
 }
 
@@ -59,7 +59,7 @@ void _patientSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeLong(offsets[0], object.idade);
-  writer.writeString(offsets[1], object.nome);
+  writer.writeString(offsets[1], object.identificador);
 }
 
 Patient _patientDeserialize(
@@ -286,20 +286,21 @@ extension PatientQueryFilter
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> nomeEqualTo(
+  QueryBuilder<Patient, Patient, QAfterFilterCondition> identificadorEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'nome',
+        property: r'identificador',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> nomeGreaterThan(
+  QueryBuilder<Patient, Patient, QAfterFilterCondition>
+      identificadorGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -307,14 +308,14 @@ extension PatientQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'nome',
+        property: r'identificador',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> nomeLessThan(
+  QueryBuilder<Patient, Patient, QAfterFilterCondition> identificadorLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -322,14 +323,14 @@ extension PatientQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'nome',
+        property: r'identificador',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> nomeBetween(
+  QueryBuilder<Patient, Patient, QAfterFilterCondition> identificadorBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -338,7 +339,7 @@ extension PatientQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'nome',
+        property: r'identificador',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -348,69 +349,70 @@ extension PatientQueryFilter
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> nomeStartsWith(
+  QueryBuilder<Patient, Patient, QAfterFilterCondition> identificadorStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'nome',
+        property: r'identificador',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> nomeEndsWith(
+  QueryBuilder<Patient, Patient, QAfterFilterCondition> identificadorEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'nome',
+        property: r'identificador',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> nomeContains(
+  QueryBuilder<Patient, Patient, QAfterFilterCondition> identificadorContains(
       String value,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
-        property: r'nome',
+        property: r'identificador',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> nomeMatches(
+  QueryBuilder<Patient, Patient, QAfterFilterCondition> identificadorMatches(
       String pattern,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
-        property: r'nome',
+        property: r'identificador',
         wildcard: pattern,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> nomeIsEmpty() {
+  QueryBuilder<Patient, Patient, QAfterFilterCondition> identificadorIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'nome',
+        property: r'identificador',
         value: '',
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> nomeIsNotEmpty() {
+  QueryBuilder<Patient, Patient, QAfterFilterCondition>
+      identificadorIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'nome',
+        property: r'identificador',
         value: '',
       ));
     });
@@ -436,15 +438,15 @@ extension PatientQuerySortBy on QueryBuilder<Patient, Patient, QSortBy> {
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterSortBy> sortByNome() {
+  QueryBuilder<Patient, Patient, QAfterSortBy> sortByIdentificador() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'nome', Sort.asc);
+      return query.addSortBy(r'identificador', Sort.asc);
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterSortBy> sortByNomeDesc() {
+  QueryBuilder<Patient, Patient, QAfterSortBy> sortByIdentificadorDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'nome', Sort.desc);
+      return query.addSortBy(r'identificador', Sort.desc);
     });
   }
 }
@@ -475,15 +477,15 @@ extension PatientQuerySortThenBy
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterSortBy> thenByNome() {
+  QueryBuilder<Patient, Patient, QAfterSortBy> thenByIdentificador() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'nome', Sort.asc);
+      return query.addSortBy(r'identificador', Sort.asc);
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterSortBy> thenByNomeDesc() {
+  QueryBuilder<Patient, Patient, QAfterSortBy> thenByIdentificadorDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'nome', Sort.desc);
+      return query.addSortBy(r'identificador', Sort.desc);
     });
   }
 }
@@ -496,10 +498,11 @@ extension PatientQueryWhereDistinct
     });
   }
 
-  QueryBuilder<Patient, Patient, QDistinct> distinctByNome(
+  QueryBuilder<Patient, Patient, QDistinct> distinctByIdentificador(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'nome', caseSensitive: caseSensitive);
+      return query.addDistinctBy(r'identificador',
+          caseSensitive: caseSensitive);
     });
   }
 }
@@ -518,9 +521,9 @@ extension PatientQueryProperty
     });
   }
 
-  QueryBuilder<Patient, String, QQueryOperations> nomeProperty() {
+  QueryBuilder<Patient, String, QQueryOperations> identificadorProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'nome');
+      return query.addPropertyName(r'identificador');
     });
   }
 }

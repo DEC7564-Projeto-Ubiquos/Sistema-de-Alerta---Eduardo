@@ -23,8 +23,8 @@ class _SamplesState extends State<Samples> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               controller: _scrollController,
-              child: Row(
-                children: const [
+              child: const Row(
+                children: [
                   SampleCard(
                     nome: 'Referência',
                     valor: '100%',

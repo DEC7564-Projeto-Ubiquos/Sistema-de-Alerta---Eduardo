@@ -6,7 +6,11 @@ import 'package:emg_app/widgets/samples.dart';
 import 'package:flutter/material.dart';
 
 class Panel extends StatelessWidget {
-  const Panel({super.key});
+  final Patient patient;
+  const Panel({
+    super.key,
+    required this.patient,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +31,8 @@ class Panel extends StatelessWidget {
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         PatientSection(
-                          patient: Patient('Igor Enrick de Carvalho', 26),
+                          patient:
+                              Patient(patient.identificador, patient.idade),
                         ),
                         const SizedBox(height: 10),
                         const Graph(),

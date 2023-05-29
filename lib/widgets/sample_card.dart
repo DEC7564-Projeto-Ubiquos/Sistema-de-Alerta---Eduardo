@@ -43,7 +43,12 @@ class SampleCard extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
               child: TextButton(
                 onPressed: () {},
-                child: const Text('Medir'),
+                child: const Text(
+                  'Medir',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 98, 0, 238),
+                  ),
+                ),
               ),
             ),
           ],

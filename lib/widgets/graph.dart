@@ -44,6 +44,9 @@ class _GraphState extends State<Graph> {
                   padding: const EdgeInsets.all(8.0),
                   child: FilledButton(
                     onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 98, 0, 238),
+                    ),
                     child: const Icon(
                       Icons.question_mark,
                       size: 16,
@@ -54,6 +57,9 @@ class _GraphState extends State<Graph> {
                   padding: const EdgeInsets.all(8.0),
                   child: FilledButton(
                     onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 98, 0, 238),
+                    ),
                     child: const Icon(
                       Icons.question_mark,
                       size: 16,
@@ -64,6 +70,9 @@ class _GraphState extends State<Graph> {
                   padding: const EdgeInsets.all(8.0),
                   child: FilledButton(
                     onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 98, 0, 238),
+                    ),
                     child: const Icon(
                       Icons.question_mark,
                       size: 16,
@@ -74,6 +83,9 @@ class _GraphState extends State<Graph> {
                   padding: const EdgeInsets.all(8.0),
                   child: FilledButton(
                     onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 98, 0, 238),
+                    ),
                     child: const Icon(
                       Icons.question_mark,
                       size: 16,
