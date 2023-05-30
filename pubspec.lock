@@ -209,22 +209,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
-  fluent_ui:
-    dependency: "direct main"
-    description:
-      name: fluent_ui
-      sha256: "456c66be2d1e5eab4c0f81dac1c55e023e65d31e81488ed4463741ce10928417"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.6.2"
-  fluentui_system_icons:
-    dependency: "direct main"
-    description:
-      name: fluentui_system_icons
-      sha256: "2e171e8272f07536b11218574cb0210a5b99efca8050b418464d2748db9d15f8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.199"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -238,11 +222,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
-  flutter_localizations:
-    dependency: transitive
-    description: flutter
-    source: sdk
-    version: "0.0.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -260,10 +239,10 @@ packages:
     dependency: "direct main"
     description:
       name: get_it
-      sha256: "290fde3a86072e4b37dbb03c07bec6126f0ecc28dad403c12ffe2e5a2d751ab7"
+      sha256: "529de303c739fca98cd7ece5fca500d8ff89649f1bb4b4e94fb20954abcd7468"
       url: "https://pub.dev"
     source: hosted
-    version: "7.2.0"
+    version: "7.6.0"
   glob:
     dependency: transitive
     description:
@@ -297,7 +276,7 @@ packages:
     source: hosted
     version: "4.0.2"
   intl:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: intl
       sha256: a3715e3bc90294e971cb7dc063fbf3cd9ee0ebf8604ffeafabd9e6f16abbdbe6
@@ -384,14 +363,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.0"
-  math_expressions:
-    dependency: transitive
-    description:
-      name: math_expressions
-      sha256: "3576593617c3870d75728a751f6ec6e606706d44e363f088ac394b5a28a98064"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.4.0"
   meta:
     dependency: transitive
     description:
@@ -464,22 +435,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.2"
-  recase:
-    dependency: transitive
-    description:
-      name: recase
-      sha256: e4eb4ec2dcdee52dcf99cb4ceabaffc631d7424ee55e56f280bc039737f89213
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.1.0"
-  scroll_pos:
-    dependency: transitive
-    description:
-      name: scroll_pos
-      sha256: "4246bff3afc779d87cdf650a67d42d67ae71b23ff020d14592e6b89e28a7f9cc"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.0"
   shelf:
     dependency: transitive
     description:
@@ -646,5 +601,5 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=3.0.0 <4.0.0"
-  flutter: ">=3.10.0"
+  dart: ">=3.0.0-0 <4.0.0"
+  flutter: ">=3.0.0"

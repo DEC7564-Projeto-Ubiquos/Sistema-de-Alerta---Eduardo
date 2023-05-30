@@ -3,7 +3,7 @@ import 'package:emg_app/services/patient_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PatientSection extends StatelessWidget {
+class PatientSection extends StatefulWidget {
   final Patient patient;
   const PatientSection({
     super.key,
@@ -11,106 +11,330 @@ class PatientSection extends StatelessWidget {
   });
 
   @override
+  State<PatientSection> createState() => _PatientSectionState();
+}
+
+class _PatientSectionState extends State<PatientSection> {
+  late PatientProvider patientProvider;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    patientProvider = Provider.of<PatientProvider>(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context)
         .textTheme
         .apply(displayColor: Theme.of(context).colorScheme.onSurface);
 
-    return Row(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Paciente', style: textTheme.titleMedium),
-              Text(getPatientName(), style: textTheme.titleLarge),
-              Text(getPatientAge(), style: textTheme.titleSmall),
-            ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 24, 0, 18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                getPatientActionButtons(context),
+                Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Paciente', style: textTheme.titleMedium),
+                      Text(getPatientName(), style: textTheme.titleLarge),
+                      Text(getPatientAge(), style: textTheme.titleSmall),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        getActionButtons(context),
-      ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 8, 2),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(20, 98, 0, 238),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text(
+                          patientProvider.currentExam == null
+                              ? ''
+                              : patientProvider.currentExam!.name,
+                          style: textTheme.titleMedium),
+                    ),
+                    getExamActionButtons(context),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 16, 0, 2),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(20, 98, 0, 238),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text('EMG', style: textTheme.titleMedium),
+                    ),
+                    getEMGActionButtons(context),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   bool hasPatient() {
-    return patient.identificador.isNotEmpty;
+    return patientProvider.selectedPatient != null;
   }
 
-  getActionButtons(BuildContext context) {
+  getPatientActionButtons(BuildContext context) {
     if (hasPatient()) {
       return Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FilledButton(
+          Tooltip(
+            message: 'Fechar',
+            child: IconButton(
               onPressed: () {
                 Provider.of<PatientProvider>(context, listen: false)
                     .clearSelectedPatient();
                 Provider.of<PatientProvider>(context, listen: false)
                     .checkForSelectedPatient(context);
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 98, 0, 238),
-              ),
-              child: const Icon(
+              icon: const Icon(
                 Icons.close,
                 size: 16,
+                color: Color.fromARGB(255, 98, 0, 238),
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FilledButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 98, 0, 238),
-              ),
-              child: const Icon(
-                Icons.save,
+          Tooltip(
+            message: 'Editar',
+            child: IconButton(
+              onPressed: () {
+                patientProvider.showEditPatientDialog(context);
+              },
+              icon: const Icon(
+                Icons.edit,
                 size: 16,
+                color: Color.fromARGB(255, 98, 0, 238),
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FilledButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 98, 0, 238),
-              ),
-              child: const Icon(
-                Icons.picture_as_pdf,
+          Tooltip(
+            message: 'Excluir',
+            child: IconButton(
+              onPressed: () async {
+                await patientProvider.deletePatient(context).then((_) {
+                  Provider.of<PatientProvider>(context, listen: false)
+                      .checkForSelectedPatient(context);
+                });
+              },
+              icon: const Icon(
+                Icons.delete,
                 size: 16,
+                color: Color.fromARGB(255, 98, 0, 238),
               ),
             ),
           ),
         ],
       );
-    } else {
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: FilledButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color.fromARGB(255, 98, 0, 238),
+    }
+  }
+
+  bool hasExam() {
+    return patientProvider.currentExam != null;
+  }
+
+  getExamActionButtons(BuildContext context) {
+    if (hasPatient()) {
+      return Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Tooltip(
+              message: 'Novo',
+              child: IconButton(
+                onPressed: () {
+                  patientProvider.createExam();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 98, 0, 238),
+                ),
+                icon: const Icon(
+                  Icons.add_chart,
+                  size: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ),
           ),
-          child: const Icon(
-            Icons.add,
-            size: 16,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Tooltip(
+              message: 'Renomear',
+              child: IconButton(
+                onPressed: () {
+                  patientProvider.showRenameExamDialog(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 98, 0, 238),
+                ),
+                icon: const Icon(
+                  Icons.edit,
+                  size: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Tooltip(
+              message: 'Salvar',
+              child: IconButton(
+                onPressed: () {
+                  patientProvider.saveExam();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 98, 0, 238),
+                ),
+                icon: const Icon(
+                  Icons.save,
+                  size: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Tooltip(
+              message: 'Exportar (PDF)',
+              child: IconButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 98, 0, 238),
+                ),
+                icon: const Icon(
+                  Icons.picture_as_pdf,
+                  size: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Tooltip(
+              message: 'Excluir',
+              child: IconButton(
+                onPressed: () {
+                  patientProvider.deleteExam(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 98, 0, 238),
+                ),
+                icon: const Icon(
+                  Icons.delete,
+                  size: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
       );
     }
   }
 
+  getEMGActionButtons(BuildContext context) {
+    return Row(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Tooltip(
+            message: 'Parear Sensor',
+            child: IconButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 98, 0, 238),
+              ),
+              icon: const Icon(
+                Icons.bluetooth,
+                size: 16,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Tooltip(
+            message: 'Calibrar',
+            child: IconButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 98, 0, 238),
+              ),
+              icon: const Icon(
+                Icons.compass_calibration,
+                size: 16,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Tooltip(
+            message: 'Medir Referência',
+            child: IconButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 98, 0, 238),
+              ),
+              icon: const Icon(
+                Icons.timeline,
+                size: 16,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   String getPatientAge() {
     if (hasPatient()) {
-      if (patient.idade == 1) {
-        return '${patient.idade} ano';
+      if (widget.patient.age == 1) {
+        return '${widget.patient.age} ano';
       } else {
-        return '${patient.idade} anos';
+        return '${widget.patient.age} anos';
       }
     } else {
       return '';
@@ -119,7 +343,7 @@ class PatientSection extends StatelessWidget {
 
   String getPatientName() {
     if (hasPatient()) {
-      return patient.identificador;
+      return widget.patient.identification;
     } else {
       return 'Selecione o Paciente';
     }

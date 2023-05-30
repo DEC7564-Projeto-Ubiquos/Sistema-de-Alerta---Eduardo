@@ -24,7 +24,7 @@ class PatientCard extends StatelessWidget {
       ),
       child: ListTile(
         title: Text(
-          patient.identificador,
+          patient.identification,
         ),
         subtitle: Text(
           getPatientAge(),
@@ -39,10 +39,10 @@ class PatientCard extends StatelessWidget {
   }
 
   String getPatientAge() {
-    if (patient.idade == 1) {
-      return '${patient.idade} ano';
+    if (patient.age == 1) {
+      return '${patient.age} ano';
     } else {
-      return '${patient.idade} anos';
+      return '${patient.age} anos';
     }
   }
 }

@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'patient.dart';
+part of 'sample.dart';
 
 // **************************************************************************
 // IsarCollectionGenerator
@@ -9,74 +9,81 @@ part of 'patient.dart';
 // coverage:ignore-file
 // ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
 
-extension GetPatientCollection on Isar {
-  IsarCollection<Patient> get patients => this.collection();
+extension GetSampleCollection on Isar {
+  IsarCollection<Sample> get samples => this.collection();
 }
 
-const PatientSchema = CollectionSchema(
-  name: r'Patient',
-  id: -3057427754190339924,
+const SampleSchema = CollectionSchema(
+  name: r'Sample',
+  id: 2629167913181080658,
   properties: {
-    r'age': PropertySchema(
+    r'examId': PropertySchema(
       id: 0,
-      name: r'age',
+      name: r'examId',
       type: IsarType.long,
     ),
-    r'identification': PropertySchema(
+    r'name': PropertySchema(
       id: 1,
-      name: r'identification',
+      name: r'name',
       type: IsarType.string,
+    ),
+    r'value': PropertySchema(
+      id: 2,
+      name: r'value',
+      type: IsarType.double,
     )
   },
-  estimateSize: _patientEstimateSize,
-  serialize: _patientSerialize,
-  deserialize: _patientDeserialize,
-  deserializeProp: _patientDeserializeProp,
+  estimateSize: _sampleEstimateSize,
+  serialize: _sampleSerialize,
+  deserialize: _sampleDeserialize,
+  deserializeProp: _sampleDeserializeProp,
   idName: r'id',
   indexes: {},
   links: {},
   embeddedSchemas: {},
-  getId: _patientGetId,
-  getLinks: _patientGetLinks,
-  attach: _patientAttach,
+  getId: _sampleGetId,
+  getLinks: _sampleGetLinks,
+  attach: _sampleAttach,
   version: '3.0.5',
 );
 
-int _patientEstimateSize(
-  Patient object,
+int _sampleEstimateSize(
+  Sample object,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  bytesCount += 3 + object.identification.length * 3;
+  bytesCount += 3 + object.name.length * 3;
   return bytesCount;
 }
 
-void _patientSerialize(
-  Patient object,
+void _sampleSerialize(
+  Sample object,
   IsarWriter writer,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeLong(offsets[0], object.age);
-  writer.writeString(offsets[1], object.identification);
+  writer.writeLong(offsets[0], object.examId);
+  writer.writeString(offsets[1], object.name);
+  writer.writeDouble(offsets[2], object.value);
 }
 
-Patient _patientDeserialize(
+Sample _sampleDeserialize(
   Id id,
   IsarReader reader,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = Patient(
-    reader.readString(offsets[1]),
+  final object = Sample(
     reader.readLong(offsets[0]),
+    reader.readString(offsets[1]),
+    reader.readDouble(offsets[2]),
     id: id,
   );
   return object;
 }
 
-P _patientDeserializeProp<P>(
+P _sampleDeserializeProp<P>(
   IsarReader reader,
   int propertyId,
   int offset,
@@ -87,33 +94,35 @@ P _patientDeserializeProp<P>(
       return (reader.readLong(offset)) as P;
     case 1:
       return (reader.readString(offset)) as P;
+    case 2:
+      return (reader.readDouble(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
 }
 
-Id _patientGetId(Patient object) {
+Id _sampleGetId(Sample object) {
   return object.id;
 }
 
-List<IsarLinkBase<dynamic>> _patientGetLinks(Patient object) {
+List<IsarLinkBase<dynamic>> _sampleGetLinks(Sample object) {
   return [];
 }
 
-void _patientAttach(IsarCollection<dynamic> col, Id id, Patient object) {
+void _sampleAttach(IsarCollection<dynamic> col, Id id, Sample object) {
   object.id = id;
 }
 
-extension PatientQueryWhereSort on QueryBuilder<Patient, Patient, QWhere> {
-  QueryBuilder<Patient, Patient, QAfterWhere> anyId() {
+extension SampleQueryWhereSort on QueryBuilder<Sample, Sample, QWhere> {
+  QueryBuilder<Sample, Sample, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
     });
   }
 }
 
-extension PatientQueryWhere on QueryBuilder<Patient, Patient, QWhereClause> {
-  QueryBuilder<Patient, Patient, QAfterWhereClause> idEqualTo(Id id) {
+extension SampleQueryWhere on QueryBuilder<Sample, Sample, QWhereClause> {
+  QueryBuilder<Sample, Sample, QAfterWhereClause> idEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IdWhereClause.between(
         lower: id,
@@ -122,7 +131,7 @@ extension PatientQueryWhere on QueryBuilder<Patient, Patient, QWhereClause> {
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterWhereClause> idNotEqualTo(Id id) {
+  QueryBuilder<Sample, Sample, QAfterWhereClause> idNotEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -144,7 +153,7 @@ extension PatientQueryWhere on QueryBuilder<Patient, Patient, QWhereClause> {
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterWhereClause> idGreaterThan(Id id,
+  QueryBuilder<Sample, Sample, QAfterWhereClause> idGreaterThan(Id id,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
@@ -153,7 +162,7 @@ extension PatientQueryWhere on QueryBuilder<Patient, Patient, QWhereClause> {
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterWhereClause> idLessThan(Id id,
+  QueryBuilder<Sample, Sample, QAfterWhereClause> idLessThan(Id id,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
@@ -162,7 +171,7 @@ extension PatientQueryWhere on QueryBuilder<Patient, Patient, QWhereClause> {
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterWhereClause> idBetween(
+  QueryBuilder<Sample, Sample, QAfterWhereClause> idBetween(
     Id lowerId,
     Id upperId, {
     bool includeLower = true,
@@ -179,44 +188,43 @@ extension PatientQueryWhere on QueryBuilder<Patient, Patient, QWhereClause> {
   }
 }
 
-extension PatientQueryFilter
-    on QueryBuilder<Patient, Patient, QFilterCondition> {
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> ageEqualTo(int value) {
+extension SampleQueryFilter on QueryBuilder<Sample, Sample, QFilterCondition> {
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> examIdEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'age',
+        property: r'examId',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> ageGreaterThan(
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> examIdGreaterThan(
     int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'age',
+        property: r'examId',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> ageLessThan(
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> examIdLessThan(
     int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'age',
+        property: r'examId',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> ageBetween(
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> examIdBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -224,7 +232,7 @@ extension PatientQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'age',
+        property: r'examId',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -233,7 +241,7 @@ extension PatientQueryFilter
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> idEqualTo(Id value) {
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id',
@@ -242,7 +250,7 @@ extension PatientQueryFilter
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> idGreaterThan(
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> idGreaterThan(
     Id value, {
     bool include = false,
   }) {
@@ -255,7 +263,7 @@ extension PatientQueryFilter
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> idLessThan(
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> idLessThan(
     Id value, {
     bool include = false,
   }) {
@@ -268,7 +276,7 @@ extension PatientQueryFilter
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> idBetween(
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> idBetween(
     Id lower,
     Id upper, {
     bool includeLower = true,
@@ -285,21 +293,20 @@ extension PatientQueryFilter
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> identificationEqualTo(
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> nameEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'identification',
+        property: r'name',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition>
-      identificationGreaterThan(
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> nameGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -307,14 +314,14 @@ extension PatientQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'identification',
+        property: r'name',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> identificationLessThan(
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> nameLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -322,14 +329,14 @@ extension PatientQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'identification',
+        property: r'name',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> identificationBetween(
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> nameBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -338,7 +345,7 @@ extension PatientQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'identification',
+        property: r'name',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -348,183 +355,271 @@ extension PatientQueryFilter
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition>
-      identificationStartsWith(
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> nameStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'identification',
+        property: r'name',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> identificationEndsWith(
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> nameEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'identification',
+        property: r'name',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> identificationContains(
-      String value,
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> nameContains(String value,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
-        property: r'identification',
+        property: r'name',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition> identificationMatches(
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> nameMatches(
       String pattern,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
-        property: r'identification',
+        property: r'name',
         wildcard: pattern,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition>
-      identificationIsEmpty() {
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> nameIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'identification',
+        property: r'name',
         value: '',
       ));
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterFilterCondition>
-      identificationIsNotEmpty() {
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> nameIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'identification',
+        property: r'name',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> valueEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'value',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> valueGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'value',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> valueLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'value',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> valueBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'value',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
       ));
     });
   }
 }
 
-extension PatientQueryObject
-    on QueryBuilder<Patient, Patient, QFilterCondition> {}
+extension SampleQueryObject on QueryBuilder<Sample, Sample, QFilterCondition> {}
 
-extension PatientQueryLinks
-    on QueryBuilder<Patient, Patient, QFilterCondition> {}
+extension SampleQueryLinks on QueryBuilder<Sample, Sample, QFilterCondition> {}
 
-extension PatientQuerySortBy on QueryBuilder<Patient, Patient, QSortBy> {
-  QueryBuilder<Patient, Patient, QAfterSortBy> sortByAge() {
+extension SampleQuerySortBy on QueryBuilder<Sample, Sample, QSortBy> {
+  QueryBuilder<Sample, Sample, QAfterSortBy> sortByExamId() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'age', Sort.asc);
+      return query.addSortBy(r'examId', Sort.asc);
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterSortBy> sortByAgeDesc() {
+  QueryBuilder<Sample, Sample, QAfterSortBy> sortByExamIdDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'age', Sort.desc);
+      return query.addSortBy(r'examId', Sort.desc);
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterSortBy> sortByIdentification() {
+  QueryBuilder<Sample, Sample, QAfterSortBy> sortByName() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'identification', Sort.asc);
+      return query.addSortBy(r'name', Sort.asc);
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterSortBy> sortByIdentificationDesc() {
+  QueryBuilder<Sample, Sample, QAfterSortBy> sortByNameDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'identification', Sort.desc);
+      return query.addSortBy(r'name', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterSortBy> sortByValue() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'value', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterSortBy> sortByValueDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'value', Sort.desc);
     });
   }
 }
 
-extension PatientQuerySortThenBy
-    on QueryBuilder<Patient, Patient, QSortThenBy> {
-  QueryBuilder<Patient, Patient, QAfterSortBy> thenByAge() {
+extension SampleQuerySortThenBy on QueryBuilder<Sample, Sample, QSortThenBy> {
+  QueryBuilder<Sample, Sample, QAfterSortBy> thenByExamId() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'age', Sort.asc);
+      return query.addSortBy(r'examId', Sort.asc);
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterSortBy> thenByAgeDesc() {
+  QueryBuilder<Sample, Sample, QAfterSortBy> thenByExamIdDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'age', Sort.desc);
+      return query.addSortBy(r'examId', Sort.desc);
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterSortBy> thenById() {
+  QueryBuilder<Sample, Sample, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterSortBy> thenByIdDesc() {
+  QueryBuilder<Sample, Sample, QAfterSortBy> thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterSortBy> thenByIdentification() {
+  QueryBuilder<Sample, Sample, QAfterSortBy> thenByName() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'identification', Sort.asc);
+      return query.addSortBy(r'name', Sort.asc);
     });
   }
 
-  QueryBuilder<Patient, Patient, QAfterSortBy> thenByIdentificationDesc() {
+  QueryBuilder<Sample, Sample, QAfterSortBy> thenByNameDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'identification', Sort.desc);
+      return query.addSortBy(r'name', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterSortBy> thenByValue() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'value', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterSortBy> thenByValueDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'value', Sort.desc);
     });
   }
 }
 
-extension PatientQueryWhereDistinct
-    on QueryBuilder<Patient, Patient, QDistinct> {
-  QueryBuilder<Patient, Patient, QDistinct> distinctByAge() {
+extension SampleQueryWhereDistinct on QueryBuilder<Sample, Sample, QDistinct> {
+  QueryBuilder<Sample, Sample, QDistinct> distinctByExamId() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'age');
+      return query.addDistinctBy(r'examId');
     });
   }
 
-  QueryBuilder<Patient, Patient, QDistinct> distinctByIdentification(
+  QueryBuilder<Sample, Sample, QDistinct> distinctByName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'identification',
-          caseSensitive: caseSensitive);
+      return query.addDistinctBy(r'name', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QDistinct> distinctByValue() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'value');
     });
   }
 }
 
-extension PatientQueryProperty
-    on QueryBuilder<Patient, Patient, QQueryProperty> {
-  QueryBuilder<Patient, int, QQueryOperations> idProperty() {
+extension SampleQueryProperty on QueryBuilder<Sample, Sample, QQueryProperty> {
+  QueryBuilder<Sample, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
     });
   }
 
-  QueryBuilder<Patient, int, QQueryOperations> ageProperty() {
+  QueryBuilder<Sample, int, QQueryOperations> examIdProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'age');
+      return query.addPropertyName(r'examId');
     });
   }
 
-  QueryBuilder<Patient, String, QQueryOperations> identificationProperty() {
+  QueryBuilder<Sample, String, QQueryOperations> nameProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'identification');
+      return query.addPropertyName(r'name');
+    });
+  }
+
+  QueryBuilder<Sample, double, QQueryOperations> valueProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'value');
     });
   }
 }

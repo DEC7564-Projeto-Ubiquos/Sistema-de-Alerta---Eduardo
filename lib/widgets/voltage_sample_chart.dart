@@ -5,43 +5,50 @@ class VoltageSample {
   final double sample;
   final double voltage;
 
-  VoltageSample(this.sample, this.voltage);
+  VoltageSample(
+    this.sample,
+    this.voltage,
+  );
 }
 
 class VoltageSampleChart extends StatelessWidget {
   final List<VoltageSample> data;
+  final Color color;
 
-  const VoltageSampleChart({Key? key, required this.data}) : super(key: key);
+  const VoltageSampleChart({
+    Key? key,
+    required this.data,
+    required this.color,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SfCartesianChart(
       primaryXAxis: NumericAxis(
         title: AxisTitle(text: 'Amostra (kHz)'),
-        interval: 1,
+        interval: 100,
         majorGridLines: const MajorGridLines(width: 0),
       ),
       primaryYAxis: NumericAxis(
         title: AxisTitle(text: 'Tensão (mV)'),
-        interval: 100,
+        interval: 500,
         majorGridLines: const MajorGridLines(width: 0),
       ),
       series: <ChartSeries>[
         SplineSeries<VoltageSample, double>(
+          color: color,
           dataSource: data,
           xValueMapper: (VoltageSample voltageSample, _) =>
               voltageSample.sample,
           yValueMapper: (VoltageSample voltageSample, _) =>
               voltageSample.voltage,
           width: 2,
-          splineType: SplineType
-              .cardinal, // Adicionar esta linha para tornar a linha curva
+          splineType: SplineType.natural,
         ),
       ],
       zoomPanBehavior: ZoomPanBehavior(
-        enablePinching: true,
-        zoomMode: ZoomMode.x,
-        enablePanning: true,
+        zoomMode: ZoomMode.xy,
+        enableDoubleTapZooming: true,
       ),
     );
   }

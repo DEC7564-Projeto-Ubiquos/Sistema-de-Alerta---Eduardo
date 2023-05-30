@@ -1,5 +1,8 @@
+import 'package:emg_app/models/sample.dart';
+import 'package:emg_app/services/patient_provider.dart';
 import 'package:emg_app/widgets/sample_card.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Samples extends StatefulWidget {
   const Samples({Key? key}) : super(key: key);
@@ -10,6 +13,13 @@ class Samples extends StatefulWidget {
 
 class _SamplesState extends State<Samples> {
   final ScrollController _scrollController = ScrollController();
+  late PatientProvider patientProvider;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    patientProvider = Provider.of<PatientProvider>(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,23 +33,55 @@ class _SamplesState extends State<Samples> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               controller: _scrollController,
-              child: const Row(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SampleCard(
-                    nome: 'Referência',
-                    valor: '100%',
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Tooltip(
+                      message: 'Nova Amostra',
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () {
+                            patientProvider.createSample();
+                          },
+                          child: Container(
+                            width: 96,
+                            height: 96,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(60.0),
+                              color: const Color.fromARGB(255, 98, 0, 238),
+                            ),
+                            child: const Icon(
+                              Icons.add,
+                              size: 48,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                  SampleCard(
-                    nome: 'Amostra 1',
-                    valor: '97.5%',
-                  ),
-                  SampleCard(
-                    nome: 'Amostra 2',
-                    valor: '89.6%',
-                  ),
-                  SampleCard(
-                    nome: 'Atual',
-                    valor: '98.1%',
+                  Consumer<PatientProvider>(
+                    builder: (context, patientProvider, child) {
+                      List<Sample> samples = patientProvider.examSamples;
+
+                      if (samples.isNotEmpty) {
+                        return Row(
+                          children: samples.map((sample) {
+                            return GestureDetector(
+                                onTap: () {},
+                                child: SampleCard(
+                                  sample: sample,
+                                  color: const Color.fromARGB(255, 255, 69, 0),
+                                ));
+                          }).toList(),
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    },
                   ),
                 ],
               ),

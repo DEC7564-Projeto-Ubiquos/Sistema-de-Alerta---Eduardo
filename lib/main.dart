@@ -51,7 +51,7 @@ class _MyAppState extends State<MyApp> {
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : Panel(patient: patientProvider.selectedPatient!),
+              : const Panel(),
         );
       },
     );

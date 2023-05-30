@@ -1,13 +1,29 @@
+import 'package:emg_app/models/sample.dart';
+import 'package:emg_app/services/patient_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class SampleCard extends StatelessWidget {
-  final String nome;
-  final String valor;
+class SampleCard extends StatefulWidget {
+  final Sample sample;
+  final Color color;
   const SampleCard({
     super.key,
-    required this.nome,
-    required this.valor,
+    required this.sample,
+    required this.color,
   });
+
+  @override
+  State<SampleCard> createState() => _SampleCardState();
+}
+
+class _SampleCardState extends State<SampleCard> {
+  late PatientProvider patientProvider;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    patientProvider = Provider.of<PatientProvider>(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,36 +36,76 @@ class SampleCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
+            Container(
               width: 140,
-              height: 70,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: Image.asset(
-                  'assets/images/card_bg.png',
-                  fit: BoxFit.cover,
+              height: 10,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(8.0),
+                  topRight: Radius.circular(8.0),
                 ),
+                color: widget.color,
               ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-              child: Text(nome, style: textTheme.titleSmall),
+              child: Text(widget.sample.name, style: textTheme.titleSmall),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text(valor, style: textTheme.titleMedium),
+              child: Text(
+                  widget.sample.value == -1
+                      ? '-'
+                      : '${widget.sample.value.toString()}%',
+                  style: textTheme.titleMedium),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-              child: TextButton(
-                onPressed: () {},
-                child: const Text(
-                  'Medir',
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 98, 0, 238),
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(4, 8, 2, 8),
+                  child: Tooltip(
+                    message: 'Medir Novamente',
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: Icon(
+                        Icons.restart_alt,
+                        color: widget.color,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(2, 8, 2, 8),
+                  child: Tooltip(
+                    message: 'Renomear',
+                    child: IconButton(
+                      onPressed: () {
+                        patientProvider.showRenameSampleDialog(
+                            context, widget.sample);
+                      },
+                      icon: Icon(
+                        Icons.edit,
+                        color: widget.color,
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(2, 8, 4, 8),
+                  child: Tooltip(
+                    message: 'Excluir',
+                    child: IconButton(
+                      onPressed: () {
+                        patientProvider.deleteSample(widget.sample, context);
+                      },
+                      icon: Icon(
+                        Icons.delete,
+                        color: widget.color,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
