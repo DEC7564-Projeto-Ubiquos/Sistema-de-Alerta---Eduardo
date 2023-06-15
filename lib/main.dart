@@ -1,5 +1,6 @@
 import 'package:emg_app/screens/panel.dart';
 import 'package:emg_app/services/patient_provider.dart';
+import 'package:emg_app/services/usb_connection_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,6 +10,9 @@ void main() {
       providers: [
         ChangeNotifierProvider(
           create: (context) => PatientProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => UsbConnectionProvider(),
         ),
       ],
       child: MaterialApp(
@@ -32,8 +36,11 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     final patientProvider =
         Provider.of<PatientProvider>(context, listen: false);
+    final usbConnectionProvider =
+        Provider.of<UsbConnectionProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await patientProvider.init();
+      await usbConnectionProvider.init();
       if (patientProvider.selectedPatient == null) {
         Future.microtask(
             () => patientProvider.checkForSelectedPatient(context));

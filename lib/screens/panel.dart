@@ -38,7 +38,7 @@ class _PanelState extends State<Panel> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
+                  SizedBox(
                     width: constraints.maxWidth * 0.75,
                     child: SingleChildScrollView(
                       child: Column(
@@ -68,7 +68,7 @@ class _PanelState extends State<Panel> {
                       ),
                     ),
                   ),
-                  Container(
+                  SizedBox(
                     width: constraints.maxWidth * 0.25,
                     child:
                         History(patientId: patientProvider.selectedPatient!.id),

@@ -7,11 +7,13 @@ class Sample {
   int examId;
   String name;
   double value;
+  String filePath;
 
   Sample(
     this.examId,
     this.name,
-    this.value, {
+    this.value,
+    this.filePath, {
     Id? id,
   }) : id = id ?? Isar.autoIncrement;
 }

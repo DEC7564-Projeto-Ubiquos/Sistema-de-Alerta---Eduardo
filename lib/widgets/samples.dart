@@ -1,5 +1,6 @@
 import 'package:emg_app/models/sample.dart';
 import 'package:emg_app/services/patient_provider.dart';
+import 'package:emg_app/services/usb_connection_provider.dart';
 import 'package:emg_app/widgets/sample_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,11 +15,13 @@ class Samples extends StatefulWidget {
 class _SamplesState extends State<Samples> {
   final ScrollController _scrollController = ScrollController();
   late PatientProvider patientProvider;
+  late UsbConnectionProvider usbConnectionProvider;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     patientProvider = Provider.of<PatientProvider>(context);
+    usbConnectionProvider = Provider.of<UsbConnectionProvider>(context);
   }
 
   @override
@@ -71,10 +74,16 @@ class _SamplesState extends State<Samples> {
                         return Row(
                           children: samples.map((sample) {
                             return GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  patientProvider.setCurrentSample(
+                                    sample,
+                                    usbConnectionProvider,
+                                  );
+                                },
                                 child: SampleCard(
                                   sample: sample,
-                                  color: const Color.fromARGB(255, 255, 69, 0),
+                                  color: patientProvider
+                                      .getColor(samples.indexOf(sample)),
                                 ));
                           }).toList(),
                         );

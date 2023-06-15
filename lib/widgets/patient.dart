@@ -1,5 +1,6 @@
 import 'package:emg_app/models/patient.dart';
 import 'package:emg_app/services/patient_provider.dart';
+import 'package:emg_app/services/usb_connection_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,11 +17,13 @@ class PatientSection extends StatefulWidget {
 
 class _PatientSectionState extends State<PatientSection> {
   late PatientProvider patientProvider;
+  late UsbConnectionProvider usbConnectionProvider;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     patientProvider = Provider.of<PatientProvider>(context);
+    usbConnectionProvider = Provider.of<UsbConnectionProvider>(context);
   }
 
   @override
@@ -230,6 +233,7 @@ class _PatientSectionState extends State<PatientSection> {
               ),
             ),
           ),
+          /*
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Tooltip(
@@ -247,6 +251,7 @@ class _PatientSectionState extends State<PatientSection> {
               ),
             ),
           ),
+          */
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Tooltip(
@@ -279,12 +284,14 @@ class _PatientSectionState extends State<PatientSection> {
           child: Tooltip(
             message: 'Parear Sensor',
             child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                usbConnectionProvider.showSelectPortDialog(context);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 98, 0, 238),
               ),
               icon: const Icon(
-                Icons.bluetooth,
+                Icons.usb,
                 size: 16,
                 color: Colors.white,
               ),
@@ -296,7 +303,9 @@ class _PatientSectionState extends State<PatientSection> {
           child: Tooltip(
             message: 'Calibrar',
             child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                usbConnectionProvider.requestCalibration(context, 10);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 98, 0, 238),
               ),

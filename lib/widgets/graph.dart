@@ -1,4 +1,5 @@
 import 'package:emg_app/services/patient_provider.dart';
+import 'package:emg_app/services/usb_connection_provider.dart';
 import 'package:emg_app/widgets/voltage_sample_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,21 +12,14 @@ class Graph extends StatefulWidget {
 }
 
 class _GraphState extends State<Graph> {
-  final List<VoltageSample> sampleData = [
-    VoltageSample(0, 0),
-    VoltageSample(200, 500),
-    VoltageSample(400, 2200),
-    VoltageSample(600, 2200),
-    VoltageSample(800, 500),
-    VoltageSample(1000, 0),
-  ];
-
   late PatientProvider patientProvider;
+  late UsbConnectionProvider usbConnectionProvider;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     patientProvider = Provider.of<PatientProvider>(context);
+    usbConnectionProvider = Provider.of<UsbConnectionProvider>(context);
   }
 
   @override
@@ -42,8 +36,11 @@ class _GraphState extends State<Graph> {
             child: SizedBox(
               width: (MediaQuery.of(context).size.width * 0.75) - 64,
               child: VoltageSampleChart(
-                data: sampleData,
-                color: const Color.fromARGB(255, 255, 69, 0),
+                data: patientProvider.graphData,
+                color: patientProvider.getCurrentSampleIndex() >= 0
+                    ? patientProvider
+                        .getColor(patientProvider.getCurrentSampleIndex())
+                    : const Color.fromARGB(55, 0, 0, 0),
               ),
             ),
           );

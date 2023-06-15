@@ -22,13 +22,18 @@ const SampleSchema = CollectionSchema(
       name: r'examId',
       type: IsarType.long,
     ),
-    r'name': PropertySchema(
+    r'filePath': PropertySchema(
       id: 1,
+      name: r'filePath',
+      type: IsarType.string,
+    ),
+    r'name': PropertySchema(
+      id: 2,
       name: r'name',
       type: IsarType.string,
     ),
     r'value': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'value',
       type: IsarType.double,
     )
@@ -53,6 +58,7 @@ int _sampleEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  bytesCount += 3 + object.filePath.length * 3;
   bytesCount += 3 + object.name.length * 3;
   return bytesCount;
 }
@@ -64,8 +70,9 @@ void _sampleSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeLong(offsets[0], object.examId);
-  writer.writeString(offsets[1], object.name);
-  writer.writeDouble(offsets[2], object.value);
+  writer.writeString(offsets[1], object.filePath);
+  writer.writeString(offsets[2], object.name);
+  writer.writeDouble(offsets[3], object.value);
 }
 
 Sample _sampleDeserialize(
@@ -76,8 +83,9 @@ Sample _sampleDeserialize(
 ) {
   final object = Sample(
     reader.readLong(offsets[0]),
+    reader.readString(offsets[2]),
+    reader.readDouble(offsets[3]),
     reader.readString(offsets[1]),
-    reader.readDouble(offsets[2]),
     id: id,
   );
   return object;
@@ -95,6 +103,8 @@ P _sampleDeserializeProp<P>(
     case 1:
       return (reader.readString(offset)) as P;
     case 2:
+      return (reader.readString(offset)) as P;
+    case 3:
       return (reader.readDouble(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -237,6 +247,136 @@ extension SampleQueryFilter on QueryBuilder<Sample, Sample, QFilterCondition> {
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> filePathEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'filePath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> filePathGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'filePath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> filePathLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'filePath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> filePathBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'filePath',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> filePathStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'filePath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> filePathEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'filePath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> filePathContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'filePath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> filePathMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'filePath',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> filePathIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'filePath',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterFilterCondition> filePathIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'filePath',
+        value: '',
       ));
     });
   }
@@ -502,6 +642,18 @@ extension SampleQuerySortBy on QueryBuilder<Sample, Sample, QSortBy> {
     });
   }
 
+  QueryBuilder<Sample, Sample, QAfterSortBy> sortByFilePath() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'filePath', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterSortBy> sortByFilePathDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'filePath', Sort.desc);
+    });
+  }
+
   QueryBuilder<Sample, Sample, QAfterSortBy> sortByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -537,6 +689,18 @@ extension SampleQuerySortThenBy on QueryBuilder<Sample, Sample, QSortThenBy> {
   QueryBuilder<Sample, Sample, QAfterSortBy> thenByExamIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'examId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterSortBy> thenByFilePath() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'filePath', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Sample, Sample, QAfterSortBy> thenByFilePathDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'filePath', Sort.desc);
     });
   }
 
@@ -584,6 +748,13 @@ extension SampleQueryWhereDistinct on QueryBuilder<Sample, Sample, QDistinct> {
     });
   }
 
+  QueryBuilder<Sample, Sample, QDistinct> distinctByFilePath(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'filePath', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Sample, Sample, QDistinct> distinctByName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -608,6 +779,12 @@ extension SampleQueryProperty on QueryBuilder<Sample, Sample, QQueryProperty> {
   QueryBuilder<Sample, int, QQueryOperations> examIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'examId');
+    });
+  }
+
+  QueryBuilder<Sample, String, QQueryOperations> filePathProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'filePath');
     });
   }
 

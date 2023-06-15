@@ -1,5 +1,6 @@
 import 'package:emg_app/models/sample.dart';
 import 'package:emg_app/services/patient_provider.dart';
+import 'package:emg_app/services/usb_connection_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,11 +19,13 @@ class SampleCard extends StatefulWidget {
 
 class _SampleCardState extends State<SampleCard> {
   late PatientProvider patientProvider;
+  late UsbConnectionProvider usbConnectionProvider;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     patientProvider = Provider.of<PatientProvider>(context);
+    usbConnectionProvider = Provider.of<UsbConnectionProvider>(context);
   }
 
   @override
@@ -64,11 +67,42 @@ class _SampleCardState extends State<SampleCard> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(4, 8, 2, 8),
                   child: Tooltip(
-                    message: 'Medir Novamente',
+                    message: patientProvider.currentSample == widget.sample
+                        ? usbConnectionProvider.isReading
+                            ? 'Medindo'
+                            : widget.sample.filePath.isEmpty
+                                ? 'Medir Amostra'
+                                : 'Medir Novamente'
+                        : patientProvider
+                                .examSamples[patientProvider.examSamples
+                                    .indexOf(widget.sample)]
+                                .filePath
+                                .isEmpty
+                            ? 'Medir Amostra'
+                            : 'Medir Novamente',
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        usbConnectionProvider
+                            .measureAndStore(context, widget.sample)
+                            .then((_) {
+                          patientProvider.setCurrentSample(
+                              widget.sample, usbConnectionProvider);
+                        });
+                      },
                       icon: Icon(
-                        Icons.restart_alt,
+                        patientProvider.currentSample == widget.sample
+                            ? usbConnectionProvider.isReading
+                                ? Icons.pause
+                                : widget.sample.filePath.isEmpty
+                                    ? Icons.play_arrow
+                                    : Icons.restart_alt
+                            : patientProvider
+                                    .examSamples[patientProvider.examSamples
+                                        .indexOf(widget.sample)]
+                                    .filePath
+                                    .isEmpty
+                                ? Icons.play_arrow
+                                : Icons.restart_alt,
                         color: widget.color,
                       ),
                     ),

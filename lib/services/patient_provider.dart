@@ -1,8 +1,12 @@
+import 'dart:math';
+
 import 'package:emg_app/models/exam.dart';
 import 'package:emg_app/models/sample.dart';
 import 'package:emg_app/screens/select_patient.dart';
 import 'package:emg_app/services/isar_database/isar_database.dart';
 import 'package:emg_app/services/isar_database/isar_database_prod.dart';
+import 'package:emg_app/services/usb_connection_provider.dart';
+import 'package:emg_app/widgets/voltage_sample_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:emg_app/models/patient.dart';
 import 'package:isar/isar.dart';
@@ -11,7 +15,21 @@ class PatientProvider extends ChangeNotifier {
   Patient? _selectedPatient;
   Exam? _currentExam;
   List<Exam> _patientExams = [];
+  Sample? _currentSample;
   List<Sample> _examSamples = [];
+  List<VoltageSample> graphData = [];
+  List<Color> graphLineColor = [
+    const Color.fromARGB(255, 255, 69, 0), // Vermelho Laranja
+    const Color.fromARGB(255, 0, 128, 0), // Verde Escuro
+    const Color.fromARGB(255, 255, 215, 0), // Ouro
+    const Color.fromARGB(255, 239, 42, 148), // Rosa Profundo
+    const Color.fromARGB(255, 0, 0, 255), // Azul
+    const Color.fromARGB(255, 255, 105, 180), // Rosa Quente
+    const Color.fromARGB(255, 0, 191, 255), // Azul Céu Profundo
+    const Color.fromARGB(255, 0, 255, 127), // Verde Primavera
+    const Color.fromARGB(255, 165, 42, 42), // Marrom
+    const Color.fromARGB(255, 128, 0, 128), // Roxo
+  ];
 
   bool _showingDialog = false;
   late Isar _isar;
@@ -29,7 +47,30 @@ class PatientProvider extends ChangeNotifier {
 
   Exam? get currentExam => _currentExam;
 
+  Sample? get currentSample => _currentSample;
+
   List<Sample> get examSamples => _examSamples;
+
+  Color getColor(int index) {
+    if (index < graphLineColor.length) {
+      return graphLineColor[index];
+    } else {
+      Random random = Random();
+      Color randomColor = Color.fromARGB(
+        255,
+        random.nextInt(256), // Red
+        random.nextInt(256), // Green
+        random.nextInt(256), // Blue
+      );
+
+      graphLineColor.add(randomColor);
+
+      return randomColor;
+    }
+  }
+
+  int getCurrentSampleIndex() =>
+      _examSamples.indexWhere((sample) => sample == _currentSample);
 
   Future<Id> putPatient(Patient patient) async {
     Id id = await _db.putPatient(_isar, patient);
@@ -230,10 +271,26 @@ class PatientProvider extends ChangeNotifier {
 
   Future<void> setCurrentExam(Exam exam) async {
     _currentExam = exam;
+    graphData = [];
     await getAllSamplesByExamId(_currentExam!.id).then((samples) async {
       _examSamples = samples;
       notifyListeners();
     });
+  }
+
+  Future<void> setCurrentSample(
+      Sample sample, UsbConnectionProvider usbConnectionProvider) async {
+    graphData = [];
+    notifyListeners();
+    _currentSample = sample;
+    if (sample.filePath.isNotEmpty) {
+      usbConnectionProvider.loadCSVData(sample.filePath).then((newGraphData) {
+        graphData = newGraphData;
+        notifyListeners();
+      });
+    } else {
+      notifyListeners();
+    }
   }
 
   Future<void> deleteExam(BuildContext context) async {
@@ -339,7 +396,7 @@ class PatientProvider extends ChangeNotifier {
     }
 
     Sample newSample =
-        Sample(_currentExam!.id, 'Amostra ${maxSampleNumber + 1}', -1);
+        Sample(_currentExam!.id, 'Amostra ${maxSampleNumber + 1}', -1, '');
 
     return newSample;
   }
@@ -351,6 +408,7 @@ class PatientProvider extends ChangeNotifier {
   Future<void> createSample() async {
     await getAllSamplesByExamId(_currentExam!.id).then((samples) async {
       _examSamples = samples;
+      graphData = [];
       if (_currentExam!.id <= 0) {
         await saveExam().then((_) async {
           Sample sample = newSample(_examSamples);

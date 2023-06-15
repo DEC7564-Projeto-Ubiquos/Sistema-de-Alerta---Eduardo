@@ -6,9 +6,9 @@ class VoltageSample {
   final double voltage;
 
   VoltageSample(
-    this.sample,
-    this.voltage,
-  );
+    this.sample, [
+    this.voltage = 0,
+  ]);
 }
 
 class VoltageSampleChart extends StatelessWidget {
@@ -26,30 +26,24 @@ class VoltageSampleChart extends StatelessWidget {
     return SfCartesianChart(
       primaryXAxis: NumericAxis(
         title: AxisTitle(text: 'Amostra (kHz)'),
-        interval: 100,
         majorGridLines: const MajorGridLines(width: 0),
       ),
       primaryYAxis: NumericAxis(
         title: AxisTitle(text: 'Tensão (mV)'),
-        interval: 500,
+        //interval: 500,
         majorGridLines: const MajorGridLines(width: 0),
       ),
-      series: <ChartSeries>[
-        SplineSeries<VoltageSample, double>(
+      series: <LineSeries<VoltageSample, num>>[
+        LineSeries<VoltageSample, num>(
           color: color,
           dataSource: data,
           xValueMapper: (VoltageSample voltageSample, _) =>
               voltageSample.sample,
           yValueMapper: (VoltageSample voltageSample, _) =>
               voltageSample.voltage,
-          width: 2,
-          splineType: SplineType.natural,
+          animationDuration: 0,
         ),
       ],
-      zoomPanBehavior: ZoomPanBehavior(
-        zoomMode: ZoomMode.xy,
-        enableDoubleTapZooming: true,
-      ),
     );
   }
 }
