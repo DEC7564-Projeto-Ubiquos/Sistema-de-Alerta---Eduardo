@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:emg_app/models/sample.dart';
@@ -7,6 +8,7 @@ import 'package:emg_app/services/isar_database/isar_database_prod.dart';
 import 'package:emg_app/widgets/voltage_sample_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_libserialport/flutter_libserialport.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
@@ -26,6 +28,8 @@ class UsbConnectionProvider with ChangeNotifier {
   bool _isReading = false;
 
   bool get isReading => _isReading;
+
+  int _time = 0;
 
   Future<void> init() async {
     _isar = await _db.openIsar();
@@ -119,11 +123,11 @@ class UsbConnectionProvider with ChangeNotifier {
   }
 
   Future<void> measureAndStore(BuildContext context, Sample sample) async {
-    if (_port == null) {
-      final textTheme = Theme.of(context)
-          .textTheme
-          .apply(displayColor: Theme.of(context).colorScheme.onSurface);
+    final textTheme = Theme.of(context)
+        .textTheme
+        .apply(displayColor: Theme.of(context).colorScheme.onSurface);
 
+    if (_port == null) {
       await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -151,6 +155,11 @@ class UsbConnectionProvider with ChangeNotifier {
       return;
     }
 
+    var commandStr = "medir,${_time.toString()}\n";
+    var commandBytes = Uint8List.fromList(commandStr.codeUnits);
+
+    _port!.write(commandBytes);
+
     SerialPortReader serialPortReader = SerialPortReader(_port!);
 
     List<int> sensorData = [];
@@ -158,41 +167,58 @@ class UsbConnectionProvider with ChangeNotifier {
     _isReading = true;
     notifyListeners();
 
+    StreamSubscription<List<int>>? subscription;
+    Timer? inactivityTimer;
+
     subscription = serialPortReader.stream.listen((value) {
-      String receivedString = String.fromCharCodes(value);
+      String receivedString = utf8.decode(value);
       List<String> lines = receivedString.split('\n');
+
       for (var line in lines) {
-        line = line.trim(); // Remove caracteres indesejados como '\r'
+        line = line.trim();
         int? receivedValue;
         try {
           if (line.isNotEmpty) {
             receivedValue = int.parse(line);
           }
         } catch (e) {
-          print("Erro na conversão de string para int: $e");
-          print("String recebida: '$line'");
+          if (kDebugMode) {
+            print("Error in string to int conversion: $e");
+            print("Received string: '$line'");
+          }
         }
         if (receivedValue != null) {
           sensorData.add(receivedValue);
         }
       }
+
+      inactivityTimer?.cancel();
+      inactivityTimer = Timer(const Duration(seconds: 3), () {
+        if (_isReading) {
+          subscription?.cancel();
+          serialPortReader.close();
+          processSensorData(sensorData, sample);
+        }
+      });
     });
 
-    await Future.delayed(const Duration(seconds: 5));
+    inactivityTimer = Timer(const Duration(seconds: 3), () {
+      if (_isReading) {
+        subscription?.cancel();
+        serialPortReader.close();
+        processSensorData(sensorData, sample);
+      }
+    });
+  }
 
-    _isReading = false;
-    notifyListeners();
-
-    subscription?.cancel();
-
-    serialPortReader.close();
-
+  void processSensorData(List<int> sensorData, Sample sample) async {
     final directory = await getApplicationDocumentsDirectory();
     final path = directory.path;
     final file = File('$path/${sample.examId}_${sample.id}.csv');
     await file.writeAsString(sensorData.map((e) => e.toString()).join('\n'));
 
     sample.filePath = file.path;
+    //sample.value = ?? value é double
 
     _db.putSample(_isar, sample).then((_) {
       notifyListeners();
@@ -221,7 +247,7 @@ class UsbConnectionProvider with ChangeNotifier {
     return tempChartData;
   }
 
-  Future<void> requestCalibration(BuildContext context, int seconds) async {
+  Future<void> requestCalibration(BuildContext context) async {
     final textTheme = Theme.of(context)
         .textTheme
         .apply(displayColor: Theme.of(context).colorScheme.onSurface);
@@ -253,7 +279,7 @@ class UsbConnectionProvider with ChangeNotifier {
       return;
     }
 
-    var commandStr = "calibrar,$seconds\n";
+    var commandStr = "calibrar,,${_time.toString()}\n";
     var commandBytes = Uint8List.fromList(commandStr.codeUnits);
 
     _port!.write(commandBytes);
@@ -261,8 +287,11 @@ class UsbConnectionProvider with ChangeNotifier {
     SerialPortReader serialPortReader = SerialPortReader(_port!);
 
     Stream<String> calibrationStream = serialPortReader.stream.map((value) {
-      print(value);
-      return String.fromCharCodes(value).trim();
+      if (kDebugMode) {
+        print(value);
+      }
+      //return String.fromCharCodes(value).trim();
+      return utf8.decode(value).trim();
     });
 
     showDialog(
@@ -329,6 +358,61 @@ class UsbConnectionProvider with ChangeNotifier {
                 ],
               );
             });
+      },
+    );
+  }
+
+  Future<void> setTime(BuildContext context) async {
+    final textTheme = Theme.of(context)
+        .textTheme
+        .apply(displayColor: Theme.of(context).colorScheme.onSurface);
+
+    final timeController = TextEditingController(text: _time.toString());
+
+    return await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Tempo de Medição',
+            style: textTheme.titleLarge,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                'Informe um tempo em segundos.',
+                style: textTheme.bodyLarge,
+              ),
+              TextField(
+                controller: timeController,
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ], // Only numbers can be entered
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text(
+                'Fechar',
+                style: textTheme.bodyLarge,
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: Text(
+                'Salvar',
+                style: textTheme.bodyLarge,
+              ),
+              onPressed: () {
+                _time = int.parse(timeController.text);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
       },
     );
   }

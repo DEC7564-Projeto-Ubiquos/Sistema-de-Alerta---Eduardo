@@ -119,7 +119,7 @@ class _PatientSectionState extends State<PatientSection> {
       return Row(
         children: [
           Tooltip(
-            message: 'Fechar',
+            message: 'Fechar Paciente',
             child: IconButton(
               onPressed: () {
                 Provider.of<PatientProvider>(context, listen: false)
@@ -135,7 +135,7 @@ class _PatientSectionState extends State<PatientSection> {
             ),
           ),
           Tooltip(
-            message: 'Editar',
+            message: 'Editar Paciente',
             child: IconButton(
               onPressed: () {
                 patientProvider.showEditPatientDialog(context);
@@ -148,7 +148,7 @@ class _PatientSectionState extends State<PatientSection> {
             ),
           ),
           Tooltip(
-            message: 'Excluir',
+            message: 'Excluir Paciente',
             child: IconButton(
               onPressed: () async {
                 await patientProvider.deletePatient(context).then((_) {
@@ -179,7 +179,7 @@ class _PatientSectionState extends State<PatientSection> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Tooltip(
-              message: 'Novo',
+              message: 'Novo Exame',
               child: IconButton(
                 onPressed: () {
                   patientProvider.createExam();
@@ -198,7 +198,7 @@ class _PatientSectionState extends State<PatientSection> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Tooltip(
-              message: 'Renomear',
+              message: 'Renomear Exame',
               child: IconButton(
                 onPressed: () {
                   patientProvider.showRenameExamDialog(context);
@@ -217,7 +217,7 @@ class _PatientSectionState extends State<PatientSection> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Tooltip(
-              message: 'Salvar',
+              message: 'Salvar Exame',
               child: IconButton(
                 onPressed: () {
                   patientProvider.saveExam();
@@ -255,7 +255,7 @@ class _PatientSectionState extends State<PatientSection> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Tooltip(
-              message: 'Excluir',
+              message: 'Excluir Exame',
               child: IconButton(
                 onPressed: () {
                   patientProvider.deleteExam(context);
@@ -301,10 +301,10 @@ class _PatientSectionState extends State<PatientSection> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Tooltip(
-            message: 'Calibrar',
+            message: 'Calibrar Sensor',
             child: IconButton(
               onPressed: () {
-                usbConnectionProvider.requestCalibration(context, 10);
+                usbConnectionProvider.requestCalibration(context);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 98, 0, 238),
@@ -320,14 +320,16 @@ class _PatientSectionState extends State<PatientSection> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Tooltip(
-            message: 'Medir Referência',
+            message: 'Definir Tempo de Medição',
             child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                usbConnectionProvider.setTime(context);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 98, 0, 238),
               ),
               icon: const Icon(
-                Icons.timeline,
+                Icons.timer,
                 size: 16,
                 color: Colors.white,
               ),
