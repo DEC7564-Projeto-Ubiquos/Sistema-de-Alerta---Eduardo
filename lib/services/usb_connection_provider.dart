@@ -15,12 +15,19 @@ import 'package:path_provider/path_provider.dart';
 
 class UsbConnectionProvider with ChangeNotifier {
   late Isar _isar;
+
   final IsarDatabase _db = IsarDatabaseProd();
+
   List<String> _availablePorts = [];
+
   String? _selectedPort;
+
   SerialPort? _port;
 
+  SerialPortReader? serialPortReader;
+
   List<String> get availablePorts => _availablePorts;
+
   String? get selectedPort => _selectedPort;
 
   StreamSubscription<List<int>>? subscription;
@@ -30,6 +37,10 @@ class UsbConnectionProvider with ChangeNotifier {
   bool get isReading => _isReading;
 
   int _time = 0;
+
+  Stream<Uint8List>? serialPortStream;
+
+  StreamController<String> streamController = StreamController<String>();
 
   Future<void> init() async {
     _isar = await _db.openIsar();
@@ -94,25 +105,27 @@ class UsbConnectionProvider with ChangeNotifier {
         throw Exception('A porta $portName não está disponível');
       }
 
-      final port = SerialPort(portName);
+      _port = SerialPort(portName);
       final config = SerialPortConfig();
       config.baudRate = 115200;
-      config.bits = 8;
-      config.parity = 0;
-      config.stopBits = 1;
-      port.config = config;
+      _port!.config = config;
 
-      if (!port.openReadWrite()) {
+      if (!_port!.open(mode: SerialPortMode.readWrite)) {
         if (kDebugMode) {
           print("error opening serial port: ${SerialPort.lastError}");
         }
       } else {
         if (kDebugMode) {
-          print("está aberto: ${port.isOpen}");
+          print("está aberto: ${_port!.isOpen}");
         }
       }
-      _port = port;
+      serialPortReader = SerialPortReader(_port!);
+      serialPortStream = serialPortReader!.stream.asBroadcastStream();
+
       _selectedPort = portName;
+
+      subscription?.cancel();
+
       notifyListeners();
     } on Exception catch (e) {
       if (kDebugMode) {
@@ -127,7 +140,7 @@ class UsbConnectionProvider with ChangeNotifier {
         .textTheme
         .apply(displayColor: Theme.of(context).colorScheme.onSurface);
 
-    if (_port == null) {
+    if (_port == null || serialPortReader == null) {
       await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -155,24 +168,28 @@ class UsbConnectionProvider with ChangeNotifier {
       return;
     }
 
-    var commandStr = "medir,${_time.toString()}\n";
-    var commandBytes = Uint8List.fromList(commandStr.codeUnits);
-
-    _port!.write(commandBytes);
-
-    SerialPortReader serialPortReader = SerialPortReader(_port!);
-
     List<int> sensorData = [];
 
     _isReading = true;
     notifyListeners();
 
-    StreamSubscription<List<int>>? subscription;
-    Timer? inactivityTimer;
+    var commandStr = "medir,${_time.toString()}\n";
+    var commandBytes = Uint8List.fromList(commandStr.codeUnits);
 
-    subscription = serialPortReader.stream.listen((value) {
-      String receivedString = utf8.decode(value);
-      List<String> lines = receivedString.split('\n');
+    _port!.write(commandBytes);
+
+    _port!.flush();
+
+    subscription = serialPortStream!.listen((value) async {
+      if (kDebugMode) {
+        print('VALUE: $value');
+      }
+      String decodedValue = utf8.decode(value);
+      if (kDebugMode) {
+        print('UTF8:$decodedValue');
+      }
+
+      List<String> lines = decodedValue.split('\n');
 
       for (var line in lines) {
         line = line.trim();
@@ -191,22 +208,15 @@ class UsbConnectionProvider with ChangeNotifier {
           sensorData.add(receivedValue);
         }
       }
-
-      inactivityTimer?.cancel();
-      inactivityTimer = Timer(const Duration(seconds: 3), () {
-        if (_isReading) {
-          subscription?.cancel();
-          serialPortReader.close();
-          processSensorData(sensorData, sample);
-        }
-      });
     });
 
-    inactivityTimer = Timer(const Duration(seconds: 3), () {
+    Timer(Duration(seconds: _time), () {
       if (_isReading) {
         subscription?.cancel();
-        serialPortReader.close();
+        _isReading = false;
+        subscription?.cancel();
         processSensorData(sensorData, sample);
+        notifyListeners();
       }
     });
   }
@@ -279,19 +289,26 @@ class UsbConnectionProvider with ChangeNotifier {
       return;
     }
 
-    var commandStr = "calibrar,,${_time.toString()}\n";
+    var commandStr = "calibrar,${_time.toString()}\n";
     var commandBytes = Uint8List.fromList(commandStr.codeUnits);
 
     _port!.write(commandBytes);
 
-    SerialPortReader serialPortReader = SerialPortReader(_port!);
+    _port!.flush();
 
-    Stream<String> calibrationStream = serialPortReader.stream.map((value) {
+    if (streamController.isClosed) {
+      streamController = StreamController<String>();
+    }
+
+    subscription = serialPortStream!.listen((value) async {
       if (kDebugMode) {
-        print(value);
+        print('VALUE: $value');
       }
-      //return String.fromCharCodes(value).trim();
-      return utf8.decode(value).trim();
+      String decodedValue = utf8.decode(value).trim();
+      if (kDebugMode) {
+        print('UTF8:$decodedValue');
+      }
+      streamController.add(decodedValue);
     });
 
     showDialog(
@@ -299,14 +316,14 @@ class UsbConnectionProvider with ChangeNotifier {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return StreamBuilder<String>(
-            stream: calibrationStream,
+            stream: streamController.stream,
             builder: (context, snapshot) {
               if (kDebugMode) {
                 print('SNAPSHOT DATA:${snapshot.data}');
               }
 
               if (snapshot.data == 'finalizado') {
-                serialPortReader.close();
+                streamController.close();
               }
               return AlertDialog(
                 title: Text(
@@ -317,7 +334,7 @@ class UsbConnectionProvider with ChangeNotifier {
                   child: ListBody(
                     children: <Widget>[
                       Text(
-                        snapshot.data.toString().contains('configurando')
+                        snapshot.data == 'configurando'
                             ? 'Configurando. Aguarde...'
                             : snapshot.data == 'iniciado'
                                 ? 'Fique parado! Calibrando sensor.'
@@ -338,7 +355,8 @@ class UsbConnectionProvider with ChangeNotifier {
                           ),
                           onPressed: () {
                             Navigator.of(context).pop();
-                            serialPortReader.close();
+                            streamController.close();
+                            subscription?.cancel();
                           },
                         )
                       : snapshot.data != 'finalizado' &&
@@ -351,7 +369,8 @@ class UsbConnectionProvider with ChangeNotifier {
                               ),
                               onPressed: () {
                                 Navigator.of(context).pop();
-                                serialPortReader.close();
+                                streamController.close();
+                                subscription?.cancel();
                               },
                             )
                           : Container(),
