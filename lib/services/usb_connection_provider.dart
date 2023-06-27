@@ -106,15 +106,15 @@ class UsbConnectionProvider with ChangeNotifier {
       }
 
       _port = SerialPort(portName);
-      final config = SerialPortConfig();
-      config.baudRate = 115200;
-      _port!.config = config;
 
       if (!_port!.open(mode: SerialPortMode.readWrite)) {
         if (kDebugMode) {
           print("error opening serial port: ${SerialPort.lastError}");
         }
       } else {
+        final config = SerialPortConfig();
+        config.baudRate = 115200;
+        _port!.config = config;
         if (kDebugMode) {
           print("está aberto: ${_port!.isOpen}");
         }
