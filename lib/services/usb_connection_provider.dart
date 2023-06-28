@@ -107,23 +107,58 @@ class UsbConnectionProvider with ChangeNotifier {
 
       _port = SerialPort(portName);
 
-      if (!_port!.open(mode: SerialPortMode.readWrite)) {
-        if (kDebugMode) {
-          print("error opening serial port: ${SerialPort.lastError}");
-        }
-      } else {
-        final config = SerialPortConfig()
-          ..baudRate = 115200
-          ..bits = 8
-          ..stopBits = 1
-          ..parity = SerialPortParity.none
-          ..setFlowControl(SerialPortFlowControl.none);
+      if (Platform.isMacOS) {
+        if (!_port!.open(mode: SerialPortMode.readWrite)) {
+          if (kDebugMode) {
+            print("error opening serial port: ${SerialPort.lastError}");
+          }
+        } else {
+          if (kDebugMode) {
+            print("config macos");
+          }
+          final config = SerialPortConfig()
+            ..baudRate = 115200
+            ..bits = 8
+            ..stopBits = 1
+            ..parity = SerialPortParity.none
+            ..setFlowControl(SerialPortFlowControl.none);
 
-        _port!.config = config;
-        if (kDebugMode) {
-          print("está aberto: ${_port!.isOpen}");
+          _port!.config = config;
+
+          if (kDebugMode) {
+            print("está aberto: ${_port!.isOpen}");
+          }
         }
       }
+
+      if (Platform.isWindows) {
+        if (!_port!.openReadWrite()) {
+          if (kDebugMode) {
+            print("error opening serial port: ${SerialPort.lastError}");
+          }
+        } else {
+          if (kDebugMode) {
+            print("config windows");
+          }
+
+          while (!_port!.isOpen) {
+            if (kDebugMode) {
+              print("aguardando porta abrir ${_port!.isOpen}");
+            }
+          }
+
+          final config = SerialPortConfig();
+          config.baudRate = 115200;
+          _port!.config = config;
+
+          _port!.config = config;
+
+          if (kDebugMode) {
+            print("está aberto: ${_port!.isOpen}, ${_port!.config.baudRate}");
+          }
+        }
+      }
+
       serialPortReader = SerialPortReader(_port!);
       serialPortStream = serialPortReader!.stream.asBroadcastStream();
 
@@ -296,6 +331,8 @@ class UsbConnectionProvider with ChangeNotifier {
 
     var commandStr = "calibrar,${_time.toString()}\n";
     var commandBytes = Uint8List.fromList(commandStr.codeUnits);
+
+    _port!.flush();
 
     _port!.write(commandBytes);
 
