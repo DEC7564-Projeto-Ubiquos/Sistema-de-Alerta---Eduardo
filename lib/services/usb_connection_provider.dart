@@ -152,6 +152,7 @@ class UsbConnectionProvider with ChangeNotifier {
           _port!.config = config;
 
           _port!.config = config;
+          notifyListeners();
 
           if (kDebugMode) {
             print("está aberto: ${_port!.isOpen}, ${_port!.config.baudRate}");
@@ -161,6 +162,16 @@ class UsbConnectionProvider with ChangeNotifier {
 
       serialPortReader = SerialPortReader(_port!);
       serialPortStream = serialPortReader!.stream.asBroadcastStream();
+
+      serialPortStream!.listen((value) async {
+        if (kDebugMode) {
+          //print('CT VALUE: $value');
+        }
+        String decodedValue = ascii.decode(value);
+        if (kDebugMode) {
+          print('CT ascii:$decodedValue');
+        }
+      });
 
       _selectedPort = portName;
 
@@ -331,8 +342,6 @@ class UsbConnectionProvider with ChangeNotifier {
 
     var commandStr = "calibrar,${_time.toString()}\n";
     var commandBytes = Uint8List.fromList(commandStr.codeUnits);
-
-    _port!.flush();
 
     _port!.write(commandBytes);
 
