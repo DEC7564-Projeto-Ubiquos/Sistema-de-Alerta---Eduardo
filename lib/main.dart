@@ -18,6 +18,7 @@ void main() {
       child: MaterialApp(
         home: const MyApp(),
         theme: ThemeData(useMaterial3: true),
+        debugShowMaterialGrid: false,
       ),
     ),
   );
