@@ -117,11 +117,7 @@ class UsbConnectionProvider with ChangeNotifier {
           ..bits = 8
           ..stopBits = 1
           ..parity = SerialPortParity.none
-          ..rts = SerialPortRts.flowControl
-          ..cts = SerialPortCts.flowControl
-          ..dsr = SerialPortDsr.flowControl
-          ..dtr = SerialPortDtr.flowControl
-          ..setFlowControl(SerialPortFlowControl.rtsCts);
+          ..setFlowControl(SerialPortFlowControl.none);
 
         _port!.config = config;
         if (kDebugMode) {
