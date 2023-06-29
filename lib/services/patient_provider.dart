@@ -374,7 +374,19 @@ class PatientProvider extends ChangeNotifier {
     );
   }
 
-  Sample newSample(List<Sample> samples) {
+  Sample newSample(List<Sample> samples, String sampleName, String filePath) {
+    int maxSampleNumber = getMaxSampleNumber(samples);
+
+    Sample newSample = Sample(
+        _currentExam!.id,
+        sampleName.isEmpty ? 'Amostra ${maxSampleNumber + 1}' : sampleName,
+        -1,
+        filePath);
+
+    return newSample;
+  }
+
+  int getMaxSampleNumber(List<Sample> samples) {
     int maxSampleNumber = 0;
 
     for (Sample sample in samples) {
@@ -394,11 +406,7 @@ class PatientProvider extends ChangeNotifier {
         }
       }
     }
-
-    Sample newSample =
-        Sample(_currentExam!.id, 'Amostra ${maxSampleNumber + 1}', -1, '');
-
-    return newSample;
+    return maxSampleNumber;
   }
 
   Future<List<Sample>> getAllSamplesByExamId(Id id) async {
@@ -411,7 +419,7 @@ class PatientProvider extends ChangeNotifier {
       graphData = [];
       if (_currentExam!.id <= 0) {
         await saveExam().then((_) async {
-          Sample sample = newSample(_examSamples);
+          Sample sample = newSample(_examSamples, '', '');
           await _db.putSample(_isar, sample).then((_) async {
             await getAllSamplesByExamId(_currentExam!.id).then((samples) async {
               _examSamples = samples;
@@ -420,7 +428,7 @@ class PatientProvider extends ChangeNotifier {
           });
         });
       } else {
-        Sample sample = newSample(_examSamples);
+        Sample sample = newSample(_examSamples, '', '');
         await _db.putSample(_isar, sample).then((_) async {
           await getAllSamplesByExamId(_currentExam!.id).then((samples) async {
             _examSamples = samples;
@@ -501,6 +509,68 @@ class PatientProvider extends ChangeNotifier {
         );
       },
     );
+  }
+
+  void importSample(BuildContext context) async {
+    final textTheme = Theme.of(context)
+        .textTheme
+        .apply(displayColor: Theme.of(context).colorScheme.onSurface);
+
+    final TextEditingController sampleNameController = TextEditingController();
+
+    if (currentExam != null) {
+      await getAllSamplesByExamId(_currentExam!.id).then((samples) async {
+        sampleNameController.text =
+            'Amostra ${getMaxSampleNumber(samples) + 1}';
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                'Importar Amostra',
+                style: textTheme.titleLarge,
+              ),
+              content: TextField(
+                controller: sampleNameController,
+              ),
+              actions: [
+                TextButton(
+                  child: Text(
+                    'Cancelar',
+                    style: textTheme.bodyLarge,
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                TextButton(
+                  child: Text(
+                    'Importar',
+                    style: textTheme.bodyLarge,
+                  ),
+                  onPressed: () async {
+                    if (sampleNameController.text.isNotEmpty &&
+                        _currentExam != null) {
+                      Sample sample =
+                          newSample(samples, sampleNameController.text, '');
+                      sample.name = sampleNameController.text;
+
+                      await _db.putSample(_isar, sample).then((_) async {
+                        await getAllSamplesByExamId(_currentExam!.id)
+                            .then((samples) {
+                          _examSamples = samples;
+                          notifyListeners();
+                          Navigator.of(context).pop();
+                        });
+                      });
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      });
+    }
   }
 
   void showEditPatientDialog(BuildContext context) async {

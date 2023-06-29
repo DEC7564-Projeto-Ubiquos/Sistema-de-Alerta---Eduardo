@@ -40,7 +40,34 @@ class _SamplesState extends State<Samples> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(30.0),
+                    padding: const EdgeInsets.only(left: 30),
+                    child: Tooltip(
+                      message: 'Importar Amostra',
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () {
+                            patientProvider.importSample(context);
+                          },
+                          child: Container(
+                            width: 96,
+                            height: 96,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(60.0),
+                              color: const Color.fromARGB(255, 98, 0, 238),
+                            ),
+                            child: const Icon(
+                              Icons.upload_file,
+                              size: 48,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Tooltip(
                       message: 'Nova Amostra',
                       child: MouseRegion(
