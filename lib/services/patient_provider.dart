@@ -9,10 +9,9 @@ import 'package:emg_app/services/isar_database/isar_database_prod.dart';
 import 'package:emg_app/services/usb_connection_provider.dart';
 import 'package:emg_app/widgets/voltage_sample_chart.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:emg_app/models/patient.dart';
-import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -57,6 +56,8 @@ class PatientProvider extends ChangeNotifier {
   List<Sample> get examSamples => _examSamples;
 
   final ValueNotifier<String> fileNameNotifier = ValueNotifier('');
+
+  final ValueNotifier<String> dataBaseMessage = ValueNotifier('');
 
   Color getColor(int index) {
     if (index < graphLineColor.length) {
@@ -523,7 +524,7 @@ class PatientProvider extends ChangeNotifier {
         .pickFiles(
       type: FileType.any,
       allowMultiple: false,
-      onFileLoading: (FilePickerStatus status) => print(status),
+
       allowedExtensions: ['svg'],
       dialogTitle: 'Importar Amostra',
       //initialDirectory: _initialDirectoryController.text,
@@ -578,7 +579,6 @@ class PatientProvider extends ChangeNotifier {
                           style: textTheme.bodyLarge,
                         ),
                         onPressed: () => _pickFiles().then((platformFile) {
-                          print(platformFile.path);
                           fileNameNotifier.value = platformFile.name;
                           filePath = platformFile.path!;
                         }),
@@ -771,5 +771,125 @@ class PatientProvider extends ChangeNotifier {
         );
       },
     );
+  }
+
+  Future<String> _saveFile() async {
+    return FilePicker.platform
+        .saveFile(
+          type: FileType.any,
+          allowedExtensions: [],
+          dialogTitle: 'Exportar Pacientes',
+          fileName: 'emg_app_pacientes',
+          lockParentWindow: true,
+        )
+        .then((pathSelected) => pathSelected ?? '');
+  }
+
+  Future<void> exportCSVDataBaseFile(BuildContext context) async {
+    final textTheme = Theme.of(context)
+        .textTheme
+        .apply(displayColor: Theme.of(context).colorScheme.onSurface);
+
+    dataBaseMessage.value = 'Aguarde...';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Exportar Pacientes',
+            style: textTheme.titleLarge,
+          ),
+          content: ValueListenableBuilder<String>(
+            valueListenable: dataBaseMessage,
+            builder: (context, fileName, _) {
+              return Text(
+                fileName,
+                style: textTheme.titleMedium,
+              );
+            },
+          ),
+        );
+      },
+    );
+
+    await _saveFile().then(
+      (pathToSaveFile) async {
+        pathToSaveFile = '$pathToSaveFile.csv';
+        print(pathToSaveFile.toString());
+        if (pathToSaveFile.isEmpty || pathToSaveFile == 'null') {
+          dataBaseMessage.value = 'Nenhum local selecionado.';
+          return await Future.delayed(const Duration(seconds: 3))
+              .then((value) => Navigator.of(context).pop());
+        }
+
+        dataBaseMessage.value = 'Gerando arquivo...';
+        await _buildDatabaseCSVFile(pathToSaveFile).then((value) async {
+          dataBaseMessage.value = 'Arquivo gerado com sucesso.';
+          return await Future.delayed(const Duration(seconds: 3))
+              .then((value) => Navigator.of(context).pop());
+        });
+      },
+    );
+  }
+
+  Future<void> _buildDatabaseCSVFile(String filePath) async {
+    final file = File(filePath);
+    final sink = file.openWrite();
+
+    String line =
+        'Id Paciente,Identificador Paciente,Idade Paciente,Id Exame,Nome Exame,Data Exame,Id Amostra,Nome Amostra,Valor Amostra,Nome Arquivo Amostra,Valores Amostra';
+
+    sink.writeln(line);
+
+    final patients = await _db.getAllPatients(_isar);
+
+    final dateFormat = DateFormat('yyyy-MM-dd HH:mm');
+
+    for (final patient in patients) {
+      final exams = await _db.getAllExamsByPatientId(_isar, patient.id);
+
+      for (final exam in exams) {
+        final samples = await _db.getAllSamplesByExamId(_isar, exam.id);
+
+        //abre o arquivo csv e transforma ele em um array com ;
+
+        for (final sample in samples) {
+          final csvLine = [
+            patient.id.toString(),
+            patient.identification,
+            patient.age.toString(),
+            exam.id.toString(),
+            exam.name,
+            dateFormat.format(exam.date),
+            sample.id.toString(),
+            sample.name,
+            sample.value.toString(),
+            sample.filePath,
+            await readCSVFile(sample.filePath)
+          ].join(',');
+
+          sink.writeln(csvLine);
+        }
+      }
+    }
+
+    sink.close();
+    return;
+  }
+
+  Future<String> readCSVFile(String filePath) async {
+    final file = File(filePath);
+
+    if (!file.existsSync()) {
+      throw Exception('O arquivo não existe: $filePath');
+    }
+
+    final lines = await file.readAsLines();
+    final formattedLines =
+        lines.map((line) => line.replaceAll('\n', '')).toList();
+    final csvContent = formattedLines.join(';');
+
+    return csvContent;
   }
 }

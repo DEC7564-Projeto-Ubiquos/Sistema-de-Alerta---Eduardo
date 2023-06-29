@@ -80,12 +80,34 @@ class _SelectPatientState extends State<SelectPatient> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.all(16),
+                                        padding: const EdgeInsets.fromLTRB(
+                                            16, 16, 16, 0),
                                         child: Text(
                                           'Pacientes',
                                           style: textTheme.titleLarge!.merge(
                                             const TextStyle(
                                               color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Tooltip(
+                                          message: 'Exportar Pacientes',
+                                          child: IconButton(
+                                            onPressed: () {
+                                              patientProvider
+                                                  .exportCSVDataBaseFile(
+                                                      context);
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.white,
+                                            ),
+                                            icon: const Icon(
+                                              Icons.cloud_download,
+                                              size: 16,
+                                              color: Colors.black,
                                             ),
                                           ),
                                         ),
