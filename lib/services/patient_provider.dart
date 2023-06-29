@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:emg_app/models/exam.dart';
@@ -7,9 +8,13 @@ import 'package:emg_app/services/isar_database/isar_database.dart';
 import 'package:emg_app/services/isar_database/isar_database_prod.dart';
 import 'package:emg_app/services/usb_connection_provider.dart';
 import 'package:emg_app/widgets/voltage_sample_chart.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:emg_app/models/patient.dart';
+import 'package:flutter/services.dart';
 import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
 
 class PatientProvider extends ChangeNotifier {
   Patient? _selectedPatient;
@@ -50,6 +55,8 @@ class PatientProvider extends ChangeNotifier {
   Sample? get currentSample => _currentSample;
 
   List<Sample> get examSamples => _examSamples;
+
+  final ValueNotifier<String> fileNameNotifier = ValueNotifier('');
 
   Color getColor(int index) {
     if (index < graphLineColor.length) {
@@ -511,12 +518,35 @@ class PatientProvider extends ChangeNotifier {
     );
   }
 
+  Future<PlatformFile> _pickFiles() async {
+    return await FilePicker.platform
+        .pickFiles(
+      type: FileType.any,
+      allowMultiple: false,
+      onFileLoading: (FilePickerStatus status) => print(status),
+      allowedExtensions: ['svg'],
+      dialogTitle: 'Importar Amostra',
+      //initialDirectory: _initialDirectoryController.text,
+      lockParentWindow: true,
+    )
+        .then((filePickerResult) {
+      if (filePickerResult == null) {
+        return PlatformFile(name: '', size: 0, path: '');
+      }
+      return filePickerResult.files.first;
+    });
+  }
+
   void importSample(BuildContext context) async {
     final textTheme = Theme.of(context)
         .textTheme
         .apply(displayColor: Theme.of(context).colorScheme.onSurface);
 
     final TextEditingController sampleNameController = TextEditingController();
+
+    String filePath = '';
+
+    fileNameNotifier.value = '';
 
     if (currentExam != null) {
       await getAllSamplesByExamId(_currentExam!.id).then((samples) async {
@@ -531,8 +561,46 @@ class PatientProvider extends ChangeNotifier {
                 'Importar Amostra',
                 style: textTheme.titleLarge,
               ),
-              content: TextField(
-                controller: sampleNameController,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: sampleNameController,
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  Row(
+                    children: [
+                      TextButton(
+                        child: Text(
+                          'Selecionar Arquivo',
+                          style: textTheme.bodyLarge,
+                        ),
+                        onPressed: () => _pickFiles().then((platformFile) {
+                          print(platformFile.path);
+                          fileNameNotifier.value = platformFile.name;
+                          filePath = platformFile.path!;
+                        }),
+                      ),
+                      filePath.isEmpty
+                          ? const SizedBox.shrink()
+                          : const SizedBox(
+                              height: 16,
+                              width: 16,
+                            ),
+                      ValueListenableBuilder<String>(
+                        valueListenable: fileNameNotifier,
+                        builder: (context, fileName, _) {
+                          return Text(
+                            fileName,
+                            style: textTheme.labelMedium,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
               actions: [
                 TextButton(
@@ -548,18 +616,61 @@ class PatientProvider extends ChangeNotifier {
                     style: textTheme.bodyLarge,
                   ),
                   onPressed: () async {
+                    if (currentExam!.id < 0) {
+                      Navigator.of(context).pop();
+
+                      return showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text(
+                              'Exame não Selecionado',
+                              style: textTheme.titleLarge,
+                            ),
+                            content: Text(
+                              'Nenhum exame foi selecionado. Salve o exame atual ou selecione um exame para importar amostras.',
+                              style: textTheme.titleMedium,
+                            ),
+                            actions: [
+                              TextButton(
+                                child: Text(
+                                  'Ok',
+                                  style: textTheme.bodyLarge,
+                                ),
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
                     if (sampleNameController.text.isNotEmpty &&
-                        _currentExam != null) {
-                      Sample sample =
-                          newSample(samples, sampleNameController.text, '');
+                        _currentExam != null &&
+                        filePath.isNotEmpty) {
+                      Sample sample = newSample(
+                          samples, sampleNameController.text, filePath);
                       sample.name = sampleNameController.text;
 
-                      await _db.putSample(_isar, sample).then((_) async {
-                        await getAllSamplesByExamId(_currentExam!.id)
-                            .then((samples) {
-                          _examSamples = samples;
-                          notifyListeners();
-                          Navigator.of(context).pop();
+                      await _db.putSample(_isar, sample).then((sampleId) async {
+                        final directory =
+                            await getApplicationDocumentsDirectory();
+
+                        final path = directory.path;
+                        final newFilePath =
+                            '$path/${sample.examId}_$sampleId.csv';
+                        sample.filePath = newFilePath;
+
+                        File file = File(filePath);
+                        await file.copy(newFilePath);
+
+                        await _db.putSample(_isar, sample).then((_) async {
+                          await getAllSamplesByExamId(_currentExam!.id)
+                              .then((samples) {
+                            _examSamples = samples;
+                            notifyListeners();
+                            Navigator.of(context).pop();
+                          });
                         });
                       });
                     }
