@@ -10,7 +10,8 @@ Atenção: É necessário possuir o módulo EMG UFSC (com OYMotion DFROBOT).
 3. Selecionar ou criar o paciente.
 4. Definir o tempo de coleta (ícone de timer).
 5. Seleciona o sensor (ícone usb).
-6. Calibrar o sensor (ícone de radar).
+6. Pressione o botão EN do sensor uma vez.
+7. Calibrar o sensor (ícone de radar).
 
 Se ao tentar calibrar ou medir, nenhum dado esteja sendo recebido, desconecte e conecte novamente o sensor e pressione o botão EN.
 Caso o erro persista, tente trocar a porta USB do seu computador e repita o passo anterior.
